@@ -194,3 +194,17 @@ async def logout(request: Request, saml_session: str = Depends(cookie_sec)):
             response.headers["Location"] = keycloak_logout_url
             
     return response
+
+@router.get("/saml/logout")
+def saml_logout_get():
+    """ Procesa el logout en redirect y manda al frontend """
+    response = RedirectResponse(url=settings.SAML_FRONTEND_URL)
+    response.delete_cookie("saml_session", path="/")
+    return response
+
+@router.post("/saml/logout")
+def saml_logout_post():
+    """ Procesa el logout en post y manda al frontend """
+    response = RedirectResponse(url=settings.SAML_FRONTEND_URL, status_code=status.HTTP_303_SEE_OTHER)
+    response.delete_cookie("saml_session", path="/")
+    return response
