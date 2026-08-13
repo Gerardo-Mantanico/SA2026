@@ -26,9 +26,6 @@
       "enabled": true,
       "publicClient": false,
       "secret": "oauth-client-secret-12345",
-      "postLogoutRedirectUris": [
-        "http://localhost:3000"
-      ],
       "redirectUris": [
         "http://localhost:8000/callback",
         "http://localhost:3000/callback",
@@ -42,7 +39,10 @@
       "implicitFlowEnabled": false,
       "directAccessGrantsEnabled": true,
       "serviceAccountsEnabled": false,
-      "protocol": "openid-connect"
+      "protocol": "openid-connect",
+      "attributes": {
+        "post.logout.redirect.uris": "http://localhost:3000"
+      }
     }
   ]
 }
