@@ -1,0 +1,24 @@
+# Version control ignores
+.env
+*.env
+node_modules/
+dist/
+build/
+.venv/
+env/
+venv/
+ENV/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.coverage
+htmlcov/
+
+# SAML certificates
+saml/backend/certs/*.key
+saml/backend/certs/*.crt
+saml/backend/certs/*.pem
+saml/backend/certs/*.der
+saml/backend/certs/*.csr

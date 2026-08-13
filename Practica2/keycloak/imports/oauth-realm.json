@@ -1,0 +1,45 @@
+{
+  "id": "oauth-realm",
+  "realm": "oauth-realm",
+  "enabled": true,
+  "users": [
+    {
+      "username": "oauth-user",
+      "email": "oauth-user@example.com",
+      "firstName": "OAuth",
+      "lastName": "Demo",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "password",
+          "temporary": false
+        }
+      ]
+    }
+  ],
+  "clients": [
+    {
+      "clientId": "oauth-client",
+      "name": "OAuth 2.0 / OIDC POC Client",
+      "enabled": true,
+      "publicClient": false,
+      "secret": "oauth-client-secret-12345",
+      "redirectUris": [
+        "http://localhost:8000/callback",
+        "http://localhost:3000/callback",
+        "http://localhost:3000"
+      ],
+      "webOrigins": [
+        "http://localhost:3000",
+        "http://localhost:8000"
+      ],
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": true,
+      "serviceAccountsEnabled": false,
+      "protocol": "openid-connect"
+    }
+  ]
+}
