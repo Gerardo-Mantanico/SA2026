@@ -1,0 +1,97 @@
+{
+  "id": "saml-realm",
+  "realm": "saml-realm",
+  "enabled": true,
+  "users": [
+    {
+      "username": "saml-user",
+      "email": "saml-user@example.com",
+      "firstName": "SAML",
+      "lastName": "Demo",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "password",
+          "temporary": false
+        }
+      ]
+    }
+  ],
+  "clients": [
+    {
+      "clientId": "http://localhost:8001/saml/metadata",
+      "name": "SAML Service Provider",
+      "enabled": true,
+      "protocol": "saml",
+      "frontchannelLogout": true,
+      "redirectUris": [
+        "http://localhost:8001/saml/acs",
+        "http://localhost:8001/saml/logout",
+        "http://localhost:3001"
+      ],
+      "attributes": {
+        "saml.force.post.binding": "true",
+        "saml.multivalued.roles": "false",
+        "saml.force.nameid.format": "true",
+        "saml.nameid.format": "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress",
+        "saml.assertion.signature": "true",
+        "saml.server.signature": "true",
+        "saml.client.signature": "false",
+        "saml.authnstatement": "true",
+        "saml_assertion_consumer_url_post": "http://localhost:8001/saml/acs"
+      },
+      "protocolMappers": [
+        {
+          "name": "username",
+          "protocol": "saml",
+          "protocolMapper": "saml-user-property-mapper",
+          "consentRequired": false,
+          "config": {
+            "attribute.nameformat": "urn:oasis:names:tc:SAML:2.0:attrname-format:basic",
+            "user.attribute": "username",
+            "friendly.name": "username",
+            "attribute.name": "username"
+          }
+        },
+        {
+          "name": "email",
+          "protocol": "saml",
+          "protocolMapper": "saml-user-property-mapper",
+          "consentRequired": false,
+          "config": {
+            "attribute.nameformat": "urn:oasis:names:tc:SAML:2.0:attrname-format:basic",
+            "user.attribute": "email",
+            "friendly.name": "email",
+            "attribute.name": "email"
+          }
+        },
+        {
+          "name": "firstName",
+          "protocol": "saml",
+          "protocolMapper": "saml-user-property-mapper",
+          "consentRequired": false,
+          "config": {
+            "attribute.nameformat": "urn:oasis:names:tc:SAML:2.0:attrname-format:basic",
+            "user.attribute": "firstName",
+            "friendly.name": "firstName",
+            "attribute.name": "firstName"
+          }
+        },
+        {
+          "name": "lastName",
+          "protocol": "saml",
+          "protocolMapper": "saml-user-property-mapper",
+          "consentRequired": false,
+          "config": {
+            "attribute.nameformat": "urn:oasis:names:tc:SAML:2.0:attrname-format:basic",
+            "user.attribute": "lastName",
+            "friendly.name": "lastName",
+            "attribute.name": "lastName"
+          }
+        }
+      ]
+    }
+  ]
+}

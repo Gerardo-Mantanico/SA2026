@@ -1,0 +1,70 @@
+version: '3.8'
+
+services:
+  keycloak:
+    image: quay.io/keycloak/keycloak:24.0.0
+    command: start-dev --import-realm --health-enabled=true
+    environment:
+      KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN:-admin}
+      KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD:-admin}
+      KC_LOG_LEVEL: INFO
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./keycloak/imports:/opt/keycloak/data/import
+
+  oauth-backend:
+    build:
+      context: ./oauth-oidc/backend
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      KEYCLOAK_URL: ${KEYCLOAK_URL:-http://localhost:8080}
+      KEYCLOAK_URL_INTERNAL: ${KEYCLOAK_URL_INTERNAL:-http://keycloak:8080}
+      OAUTH_REALM: ${OAUTH_REALM:-oauth-realm}
+      OAUTH_CLIENT_ID: ${OAUTH_CLIENT_ID:-oauth-client}
+      OAUTH_CLIENT_SECRET: ${OAUTH_CLIENT_SECRET:-oauth-client-secret-12345}
+      OAUTH_FRONTEND_URL: ${OAUTH_FRONTEND_URL:-http://localhost:3000}
+      OAUTH_BACKEND_URL: ${OAUTH_BACKEND_URL:-http://localhost:8000}
+    depends_on:
+      - keycloak
+
+  oauth-frontend:
+    build:
+      context: ./oauth-oidc/frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      VITE_BACKEND_URL: http://localhost:8000
+    depends_on:
+      - oauth-backend
+
+  saml-backend:
+    build:
+      context: ./saml/backend
+      dockerfile: Dockerfile
+    ports:
+      - "8001:8001"
+    environment:
+      KEYCLOAK_URL: ${KEYCLOAK_URL:-http://localhost:8080}
+      KEYCLOAK_URL_INTERNAL: ${KEYCLOAK_URL_INTERNAL:-http://keycloak:8080}
+      SAML_REALM: ${SAML_REALM:-saml-realm}
+      SAML_FRONTEND_URL: ${SAML_FRONTEND_URL:-http://localhost:3001}
+      SAML_BACKEND_URL: ${SAML_BACKEND_URL:-http://localhost:8001}
+      SAML_ENTITY_ID: ${SAML_ENTITY_ID:-http://localhost:8001/saml/metadata}
+      SAML_ACS_URL: ${SAML_ACS_URL:-http://localhost:8001/saml/acs}
+    depends_on:
+      - keycloak
+
+  saml-frontend:
+    build:
+      context: ./saml/frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3001"
+    environment:
+      VITE_BACKEND_URL: http://localhost:8001
+    depends_on:
+      - saml-backend
