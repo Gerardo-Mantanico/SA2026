@@ -60,7 +60,8 @@ def verify_token(token: str) -> dict:
             key,
             algorithms=["RS256"],
             audience=settings.OAUTH_CLIENT_ID,
-            issuer=settings.keycloak_issuer
+            issuer=settings.keycloak_issuer,
+            options={"verify_at_hash": False}
         )
         return payload
     except ExpiredSignatureError:

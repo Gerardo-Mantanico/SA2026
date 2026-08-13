@@ -63,15 +63,24 @@ async def acs(request: Request):
     first_name = firstname_list[0] if firstname_list else "SAML"
     last_name = lastname_list[0] if lastname_list else "User"
     
+    # Extraer NotBefore del XML ya que python3-saml no tiene metodo directo para este claim
+    xml_str = auth.get_last_response_xml()
+    import re
+    not_before = None
+    if xml_str:
+        match = re.search(r'NotBefore="([^"]+)"', xml_str)
+        if match:
+            not_before = match.group(1)
+
     user_data = {
         "username": username,
         "email": email,
         "name": f"{first_name} {last_name}".strip(),
         "name_id": name_id,
-        "issuer": auth.get_issuer(),
+        "issuer": auth.get_settings().get_idp_data().get('entityId'),
         "session_index": auth.get_session_index(),
         "conditions": {
-            "not_before": auth.get_last_assertion_not_before(),
+            "not_before": not_before,
             "not_on_or_after": auth.get_last_assertion_not_on_or_after()
         }
     }
