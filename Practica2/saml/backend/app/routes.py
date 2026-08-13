@@ -165,16 +165,32 @@ def get_profile(saml_session: str = Depends(cookie_sec)):
         )
 
 @router.get("/logout")
-def logout():
-    """ Limpia la cookie local y redirige al logout de Keycloak """
+async def logout(request: Request, saml_session: str = Depends(cookie_sec)):
+    """ Limpia la cookie local y hace Single Logout (SLO) en Keycloak """
     response = RedirectResponse(url=settings.SAML_FRONTEND_URL)
     response.delete_cookie("saml_session", path="/")
     
-    # URL de Keycloak para desloguear la sesion SAML con redirect_uri para retornar
-    keycloak_logout_url = (
-        f"{settings.KEYCLOAK_URL}/realms/{settings.SAML_REALM}/protocol/saml/logout"
-        f"?redirect_uri={settings.SAML_FRONTEND_URL}"
-    )
-    response.headers["Location"] = keycloak_logout_url
-    
+    if saml_session:
+        try:
+            # Desencriptar la cookie para obtener el NameID y el SessionIndex
+            unsigned_data = signer.unsign(saml_session.encode()).decode()
+            user_data = json.loads(unsigned_data)
+            name_id = user_data.get("name_id")
+            session_index = user_data.get("session_index")
+            
+            req = await prepare_fastapi_request(request)
+            auth = init_saml_auth(req)
+            
+            # Generar URL oficial de logout SAML
+            logout_url = auth.logout(
+                return_to=settings.SAML_FRONTEND_URL,
+                name_id=name_id,
+                session_index=session_index
+            )
+            response.headers["Location"] = logout_url
+        except Exception:
+            # Fallback a redireccion simple si falla la lectura de la cookie
+            keycloak_logout_url = f"{settings.KEYCLOAK_URL}/realms/{settings.SAML_REALM}/protocol/saml"
+            response.headers["Location"] = keycloak_logout_url
+            
     return response
