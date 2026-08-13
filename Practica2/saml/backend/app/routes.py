@@ -170,8 +170,11 @@ def logout():
     response = RedirectResponse(url=settings.SAML_FRONTEND_URL)
     response.delete_cookie("saml_session", path="/")
     
-    # URL de Keycloak para desloguear la sesion SAML
-    keycloak_logout_url = f"{settings.KEYCLOAK_URL}/realms/{settings.SAML_REALM}/protocol/saml/logout"
+    # URL de Keycloak para desloguear la sesion SAML con redirect_uri para retornar
+    keycloak_logout_url = (
+        f"{settings.KEYCLOAK_URL}/realms/{settings.SAML_REALM}/protocol/saml/logout"
+        f"?redirect_uri={settings.SAML_FRONTEND_URL}"
+    )
     response.headers["Location"] = keycloak_logout_url
     
     return response
